@@ -1,0 +1,21 @@
+{% extends 'platform_discovery/base.html' %}
+
+{% block title %}Categories{% endblock %}
+
+{% block content %}
+<section class="section-block">
+    <div class="section-header">
+        <h2>Explore categories</h2>
+    </div>
+    <div class="grid three-col">
+        {% for category in categories %}
+            <a href="{% url 'category_detail' category.slug %}" class="card category-card large-card">
+                <img src="{{ category.default_image_url }}" alt="{{ category.name }}" class="category-thumb" />
+                <span class="category-tag">{{ category.name }}</span>
+                <p>{{ category.description|default:'Browse student businesses in this category.' }}</p>
+                <small>{{ category.businesses.count }} businesses</small>
+            </a>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'platform_discovery/base.html' %}
+
+{% block title %}Search results{% endblock %}
+
+{% block content %}
+<section class="section-block">
+    <div class="section-header">
+        <h2>Search results for “{{ query }}”</h2>
+    </div>
+
+    {% if businesses or products %}
+        <div class="grid two-col">
+            {% if businesses %}
+                <div>
+                    <h3>Businesses</h3>
+                    {% for business in businesses %}
+                        <div class="card list-item">
+                            <a href="{% url 'business_detail' business.slug %}">{{ business.name }}</a>
+                            <p>{{ business.category.name }} • {{ business.display_location }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% if products %}
+                <div>
+                    <h3>Products</h3>
+                    {% for product in products %}
+                        <div class="card list-item">
+                            <a href="{% url 'business_detail' product.business.slug %}">{{ product.name }}</a>
+                            <p>{{ product.business.name }} • ₦{{ product.discounted_price }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="card empty-state">
+            <p>No matching businesses or products were found.</p>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

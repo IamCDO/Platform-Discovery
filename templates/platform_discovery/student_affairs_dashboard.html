@@ -1,0 +1,41 @@
+{% extends 'platform_discovery/base.html' %}
+
+{% block title %}Student affairs dashboard{% endblock %}
+
+{% block content %}
+<section class="section-block">
+    <div class="section-header">
+        <h2>Student affairs dashboard</h2>
+    </div>
+
+    {% if applications %}
+        <div class="card list-card">
+            {% for app in applications %}
+                <div class="application-row">
+                    <div>
+                        <h3>{{ app.business_name }}</h3>
+                        <p>{{ app.owner_name }} • {{ app.category.name }} • {{ app.location }}</p>
+                        <p>{{ app.description|truncatewords:18 }}</p>
+                    </div>
+                    <div class="application-actions">
+                        <span class="status-pill status-{{ app.status }}">{{ app.get_status_display }}</span>
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="application_id" value="{{ app.id }}" />
+                            <textarea name="review_notes" rows="2" placeholder="Review notes"></textarea>
+                            <div class="decision-buttons">
+                                <button type="submit" name="decision" value="approve" class="primary-btn small-btn">Approve</button>
+                                <button type="submit" name="decision" value="reject" class="secondary-btn small-btn">Reject</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card empty-state">
+            <p>No business applications are waiting for approval.</p>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

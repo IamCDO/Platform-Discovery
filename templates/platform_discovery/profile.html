@@ -1,0 +1,34 @@
+{% extends 'platform_discovery/base.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<section class="section-block narrow-form">
+    <div class="card form-card">
+        {% if mode == 'signup' %}
+            <h2>Create your account</h2>
+            <p>Sign up to browse, place orders, and register your student business.</p>
+        {% else %}
+            <h2>Login</h2>
+        {% endif %}
+
+        <form method="post" action="{% url 'profile' %}{% if next %}?next={{ next|urlencode }}{% endif %}">
+            {% csrf_token %}
+            <input type="hidden" name="mode" value="{{ mode }}" />
+            {% if next %}<input type="hidden" name="next" value="{{ next }}" />{% endif %}
+            {{ form.as_p }}
+            {% if mode == 'signup' %}
+                <button type="submit" class="primary-btn">Create account</button>
+            {% else %}
+                <button type="submit" class="primary-btn">Login</button>
+            {% endif %}
+        </form>
+
+        {% if mode == 'signup' %}
+            <p class="small-note">Already have an account? <a href="{% url 'profile' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Login here</a>.</p>
+        {% else %}
+            <p class="small-note">If you don't have an account, <a href="{% url 'profile' %}?mode=signup{% if next %}&amp;next={{ next|urlencode }}{% endif %}">click here to sign up</a>.</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

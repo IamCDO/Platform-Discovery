@@ -1,0 +1,36 @@
+{% extends 'platform_discovery/base.html' %}
+
+{% block title %}My orders{% endblock %}
+
+{% block content %}
+<section class="section-block">
+    <div class="section-header">
+        <h2>My orders</h2>
+    </div>
+
+    {% if orders %}
+        <div class="card list-card">
+            {% for order in orders %}
+                <div class="application-row">
+                    <div>
+                        <h3>Order #{{ order.id }}</h3>
+                        <p>{{ order.created_at|date:'d M Y, H:i' }}</p>
+                        <ul>
+                            {% for item in order.items.all %}
+                                <li>{{ item.product.name }} × {{ item.quantity }} — ₦{{ item.line_total }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="status-pill status-{{ order.status }}">
+                        {{ order.get_status_display }}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card empty-state">
+            <p>You have not placed any orders yet.</p>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

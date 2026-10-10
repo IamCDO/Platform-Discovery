@@ -1,0 +1,42 @@
+{% extends 'platform_discovery/base.html' %}
+
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+<section class="section-block">
+    <div class="section-header">
+        <h2>Checkout</h2>
+    </div>
+
+    {% if cart_items %}
+        <div class="card checkout-card">
+            {% for item in cart_items %}
+                <div class="cart-item">
+                    <div>
+                        <h3>{{ item.product.name }}</h3>
+                        <p>{{ item.product.business.name }}</p>
+                    </div>
+                    <div class="cart-meta">
+                        <span>{{ item.quantity }} x ₦{{ item.discounted_price }}</span>
+                        <span>₦{{ item.line_total }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="checkout-total card">
+            <span>Total payable</span>
+            <strong>₦{{ total }}</strong>
+        </div>
+
+        <form method="post" action="{% url 'checkout' %}">
+            {% csrf_token %}
+            <button type="submit" class="primary-btn">Pay now</button>
+        </form>
+    {% else %}
+        <div class="card empty-state">
+            <p>Your cart is empty. Browse products to start shopping.</p>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

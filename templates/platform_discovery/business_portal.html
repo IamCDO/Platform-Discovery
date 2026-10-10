@@ -1,0 +1,112 @@
+{% extends 'platform_discovery/base.html' %}
+
+{% block title %}Business Portal{% endblock %}
+
+{% block content %}
+<section class="section-block">
+    <div class="section-header">
+        <div>
+            <span class="eyebrow">Business owner</span>
+            <h2>Business Portal</h2>
+        </div>
+        {% if business %}
+            <a href="{% url 'business_dashboard' %}" class="primary-btn small-btn">Open dashboard</a>
+        {% endif %}
+    </div>
+
+    {% if business %}
+        <div class="card business-header">
+            <div class="card-top-row">
+                <div>
+                    <h3>{{ business.name }}</h3>
+                    <p>{{ business.description|truncatewords:22 }}</p>
+                </div>
+                <span class="status-pill status-{{ business.status }}">{{ business.get_status_display }}</span>
+            </div>
+            <div class="meta-row">
+                <span>Location: {{ business.display_location }}</span>
+                <span>Business ID: {{ business.business_id }}</span>
+            </div>
+        </div>
+    {% else %}
+        <div class="card empty-state">
+            <p>You do not have a business yet. Register your business to unlock the owner dashboard.</p>
+            <a href="{% url 'register_business' %}" class="primary-btn small-btn">Register business</a>
+        </div>
+    {% endif %}
+</section>
+
+{% if business %}
+<section class="section-block">
+    <div class="section-header">
+        <h2>Your products</h2>
+    </div>
+    <div class="grid three-col">
+        {% for product in products %}
+            <div class="card product-card">
+                <div class="card-top-row">
+                    <h3>{{ product.name }}</h3>
+                    {% if product.has_discount %}<span class="promo-pill">-{{ product.discount_percent }}%</span>{% endif %}
+                </div>
+                <p>{{ product.description|truncatewords:18 }}</p>
+                <div class="price-row">
+                    <strong>₦{{ product.discounted_price }}</strong>
+                    {% if product.has_discount %}<span class="old-price">₦{{ product.price }}</span>{% endif %}
+                </div>
+                <div class="small-meta">Stock: {{ product.stock }}</div>
+            </div>
+        {% empty %}
+            <div class="card empty-state">
+                <p>No products have been added yet.</p>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="section-header">
+        <h2>Recent orders</h2>
+    </div>
+    {% if orders %}
+        <div class="card list-card">
+            {% for item in orders %}
+                <div class="list-row">
+                    <div>
+                        <h3>{{ item.product.name }}</h3>
+                        <p>Qty: {{ item.quantity }} • Order #{{ item.order.id }}</p>
+                    </div>
+                    <span class="status-pill">₦{{ item.line_total }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card empty-state">
+            <p>No orders have been received yet.</p>
+        </div>
+    {% endif %}
+</section>
+{% endif %}
+
+<section class="section-block">
+    <div class="section-header">
+        <h2>Applications</h2>
+    </div>
+    {% if applications %}
+        <div class="card list-card">
+            {% for application in applications %}
+                <div class="application-row">
+                    <div>
+                        <h3>{{ application.business_name }}</h3>
+                        <p>{{ application.category.name }} • {{ application.location }}</p>
+                    </div>
+                    <span class="status-pill status-{{ application.status }}">{{ application.get_status_display }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card empty-state">
+            <p>You have not submitted any business applications.</p>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

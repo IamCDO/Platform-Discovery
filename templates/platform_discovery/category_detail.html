@@ -1,0 +1,53 @@
+{% extends 'platform_discovery/base.html' %}
+
+{% block title %}{{ category.name }}{% endblock %}
+
+{% block content %}
+<section class="section-block">
+    <div class="section-header">
+        <div>
+            <span class="eyebrow">Category</span>
+            <h2>{{ category.name }}</h2>
+        </div>
+        <a href="{% url 'categories' %}" class="secondary-btn small-btn">Back to categories</a>
+    </div>
+
+    <div class="card business-header">
+        <p>{{ category.description|default:'Browse student businesses and services in this category.' }}</p>
+        <div class="meta-row">
+            <span>{{ businesses.count }} business{{ businesses.count|pluralize }}</span>
+            <span>Online and campus-friendly options</span>
+        </div>
+    </div>
+
+    <form method="get" class="search-box inline-search">
+        <input type="text" name="q" value="{{ search_term }}" placeholder="Search businesses in this category" />
+        <button type="submit">Search</button>
+    </form>
+
+    <div class="grid three-col">
+        {% for business in businesses %}
+            <article class="card business-card">
+                <img src="{{ business.default_image_url }}" alt="{{ business.name }}" class="store-thumb" />
+                <div class="card-top-row">
+                    <h3><a href="{% url 'business_detail' business.slug %}">{{ business.name }}</a></h3>
+                    {% if business.is_featured %}<span class="promo-pill">Featured</span>{% endif %}
+                </div>
+                <p>{{ business.description|truncatewords:20 }}</p>
+                <div class="meta-row">
+                    <span>{{ business.display_location }}</span>
+                    <span>{{ business.business_id }}</span>
+                </div>
+                <div class="price-row">
+                    <span class="status-pill">{{ business.get_status_display }}</span>
+                    <a href="{% url 'business_detail' business.slug %}" class="primary-btn small-btn">View store</a>
+                </div>
+            </article>
+        {% empty %}
+            <div class="card empty-state">
+                <p>No businesses match your filter in this category yet.</p>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

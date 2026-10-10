@@ -1,0 +1,54 @@
+{% extends 'platform_discovery/base.html' %}
+
+{% block title %}Cart{% endblock %}
+
+{% block content %}
+<section class="section-block">
+    <div class="section-header">
+        <h2>Your cart</h2>
+    </div>
+
+    {% if cart_items %}
+        <div class="cart-list card">
+            {% for item in cart_items %}
+                <div class="cart-item">
+                    <div>
+                        <h3>{{ item.product.name }}</h3>
+                        <p>{{ item.product.business.name }}</p>
+                    </div>
+                    <div class="cart-item-actions">
+                        <div class="cart-controls" aria-label="Quantity controls for {{ item.product.name }}">
+                            <form method="post" action="{% url 'cart' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="product_id" value="{{ item.product.id }}" />
+                                <button type="submit" name="action" value="decrease" class="quantity-btn" aria-label="Reduce quantity of {{ item.product.name }}">−</button>
+                            </form>
+                            <span class="cart-quantity">{{ item.quantity }}</span>
+                            <form method="post" action="{% url 'cart' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="product_id" value="{{ item.product.id }}" />
+                                <button type="submit" name="action" value="increase" class="quantity-btn" aria-label="Increase quantity of {{ item.product.name }}">+</button>
+                            </form>
+                        </div>
+                        <strong>₦{{ item.line_total }}</strong>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="checkout-total card">
+            <span>Total</span>
+            <strong>₦{{ total }}</strong>
+        </div>
+
+        <form method="post" action="{% url 'checkout' %}">
+            {% csrf_token %}
+            <button type="submit" class="primary-btn">Confirm payment</button>
+        </form>
+    {% else %}
+        <div class="card empty-state">
+            <p>Your cart is empty.</p>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

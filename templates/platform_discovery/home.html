@@ -1,0 +1,93 @@
+{% extends 'platform_discovery/base.html' %}
+
+{% block title %}Platform Discovery | Home{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div>
+        <span class="eyebrow">Student-powered discovery</span>
+        <h1>Find the right platform for every student need.</h1>
+        <p>Connect students with university-friendly businesses, digital services, and student-led solutions in one place.</p>
+        <div class="hero-actions">
+            <a href="{% url 'categories' %}" class="primary-btn">Browse categories</a>
+            <a href="{% url 'register_business' %}" class="secondary-btn">Register a business</a>
+        </div>
+    </div>
+    <div class="hero-panel card">
+        <h3>Popular categories</h3>
+        <ul class="mini-list">
+            {% for category in categories|slice:':5' %}
+                <li><a href="{% url 'category_detail' category.slug %}">{{ category.name }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="section-header">
+        <h2>Categories</h2>
+        <a href="{% url 'categories' %}">View all</a>
+    </div>
+    <div class="grid three-col">
+        {% for category in categories %}
+            <a href="{% url 'category_detail' category.slug %}" class="category-card card">
+                <img src="{{ category.default_image_url }}" alt="{{ category.name }}" class="category-thumb" />
+                <span class="category-tag">{{ category.name }}</span>
+                <p>{{ category.description|default:'Student businesses and services for this category.' }}</p>
+            </a>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="section-header">
+        <h2>Featured businesses</h2>
+    </div>
+    <div class="grid three-col">
+        {% for business in featured_businesses %}
+            <div class="card business-card">
+                <img src="{{ business.default_image_url }}" alt="{{ business.name }}" class="store-thumb" />
+                <div class="card-top-row">
+                    <h3><a href="{% url 'business_detail' business.slug %}">{{ business.name }}</a></h3>
+                    {% if business.is_featured %}<span class="promo-pill">Featured</span>{% endif %}
+                </div>
+                <p>{{ business.description|truncatewords:18 }}</p>
+                <div class="meta-row">
+                    <span>{{ business.category.name }}</span>
+                    <span>{{ business.display_location }}</span>
+                </div>
+            </div>
+        {% empty %}
+            <p>No featured businesses yet.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="section-header">
+        <h2>Hot deals</h2>
+    </div>
+    <div class="grid three-col">
+        {% for product in featured_products %}
+            <div class="card product-card">
+                <img src="{{ product.default_image_url }}" alt="{{ product.name }}" class="product-thumb" />
+                <div class="card-top-row">
+                    <h3>{{ product.name }}</h3>
+                    {% if product.has_discount %}<span class="promo-pill">-{{ product.discount_percent }}%</span>{% endif %}
+                </div>
+                <div class="meta-row small-meta-line">
+                    <span>By {{ product.business.name }}</span>
+                </div>
+                <p>{{ product.description|truncatewords:14 }}</p>
+                <div class="price-row">
+                    <strong>₦{{ product.discounted_price }}</strong>
+                    {% if product.has_discount %}<span class="old-price">₦{{ product.price }}</span>{% endif %}
+                </div>
+                <button class="primary-btn small-btn" data-add-to-cart data-product-id="{{ product.id }}">Add to cart</button>
+            </div>
+        {% empty %}
+            <p>No products are available right now.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

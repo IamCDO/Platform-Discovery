@@ -1,0 +1,31 @@
+{% extends 'platform_discovery/base.html' %}
+
+{% block title %}My applications{% endblock %}
+
+{% block content %}
+<section class="section-block">
+    <div class="section-header">
+        <h2>My business applications</h2>
+    </div>
+
+    {% if applications %}
+        <div class="card list-card">
+            {% for application in applications %}
+                <div class="list-row">
+                    <div>
+                        <h3>{{ application.business_name }}</h3>
+                        <p>{{ application.category.name }} • {{ application.location }}</p>
+                    </div>
+                    <div class="status-pill status-{{ application.status }}">
+                        {{ application.get_status_display }}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card empty-state">
+            <p>You have not submitted any business applications yet.</p>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

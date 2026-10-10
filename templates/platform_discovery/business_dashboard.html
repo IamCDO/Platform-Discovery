@@ -1,0 +1,75 @@
+{% extends 'platform_discovery/base.html' %}
+
+{% block title %}Business dashboard{% endblock %}
+
+{% block content %}
+<section class="section-block">
+    <div class="section-header">
+        <h2>{{ business.name }} dashboard</h2>
+        <a href="{% url 'create_product' %}" class="primary-btn small-btn">Add product</a>
+    </div>
+
+    <div class="grid two-col">
+        <div class="card">
+            <h3>Business details</h3>
+            <p><strong>Location:</strong> {{ business.display_location }}</p>
+            <p><strong>Business ID:</strong> {{ business.business_id }}</p>
+            <p><strong>Email:</strong> {{ business.email }}</p>
+            <p><strong>Status:</strong> {{ business.get_status_display }}</p>
+        </div>
+        <div class="card">
+            <h3>Inventory</h3>
+            <p><strong>Products:</strong> {{ products.count }}</p>
+            <p><strong>Orders:</strong> {{ orders.count }}</p>
+        </div>
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="section-header">
+        <h2>Products</h2>
+    </div>
+    <div class="grid three-col">
+        {% for product in products %}
+            <div class="card product-card">
+                <div class="card-top-row">
+                    <h3>{{ product.name }}</h3>
+                    {% if product.has_discount %}<span class="promo-pill">-{{ product.discount_percent }}%</span>{% endif %}
+                </div>
+                <p>{{ product.description|truncatewords:16 }}</p>
+                <div class="price-row">
+                    <strong>₦{{ product.discounted_price }}</strong>
+                    {% if product.has_discount %}<span class="old-price">₦{{ product.price }}</span>{% endif %}
+                </div>
+                <div class="small-meta">Stock: {{ product.stock }}</div>
+                <a href="{% url 'edit_product' product.id %}" class="secondary-btn small-btn">Edit</a>
+            </div>
+        {% empty %}
+            <p>No products added yet.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="section-header">
+        <h2>Incoming orders</h2>
+    </div>
+    {% if orders %}
+        <div class="card list-card">
+            {% for item in orders %}
+                <div class="list-row">
+                    <div>
+                        <h3>{{ item.product.name }}</h3>
+                        <p>Qty: {{ item.quantity }} • Business ID: {{ item.business.business_id }}</p>
+                    </div>
+                    <div class="status-pill">₦{{ item.line_total }}</div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card empty-state">
+            <p>No orders have been received yet.</p>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,136 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}PAU Student Business Hub{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'platform_discovery/styles.css' %}" />
+</head>
+<body>
+    <div style="display:none">{% csrf_token %}</div>
+    <header class="topbar">
+        <div class="container nav-wrap">
+            <a href="{% url 'home' %}" class="brand">PAU Student Business Hub</a>
+            <nav class="main-nav">
+                <a href="{% url 'home' %}">Home</a>
+                <a href="{% url 'categories' %}">Categories</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'register_business' %}">Register Business</a>
+                    <a href="{% url 'my_orders' %}">My Orders</a>
+                    {% if user.is_staff %}
+                        <a href="{% url 'student_affairs_dashboard' %}">Student Affairs</a>
+                    {% else %}
+                        <a href="{% url 'business_portal' %}">Business Portal</a>
+                        {% if user.owned_business %}
+                            <a href="{% url 'business_dashboard' %}">Business Dashboard</a>
+                        {% endif %}
+                    {% endif %}
+                    <a href="{% url 'my_applications' %}">My Applications</a>
+                    <form method="post" action="{% url 'logout' %}" class="logout-form">
+                        {% csrf_token %}
+                        <button type="submit" class="logout-button">Logout</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'profile' %}">Profile</a>
+                {% endif %}
+            </nav>
+            <div class="nav-actions">
+                <form action="{% url 'search_results' %}" method="get" class="search-box">
+                    <input type="text" name="q" placeholder="Search products or businesses" value="{{ request.GET.q|default:'' }}" />
+                    <button type="submit">Search</button>
+                </form>
+                <a href="{% url 'cart' %}" class="cart-link">Cart <span id="cart-count">{{ request.session.cart|length|default:0 }}</span></a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container content-wrap">
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <div id="toast" class="toast" aria-live="polite">Added to cart</div>
+
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+            return cookieValue;
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 1000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('input[type="password"]').forEach((input) => {
+                const field = document.createElement('div');
+                field.className = 'password-field';
+                input.parentNode.insertBefore(field, input);
+                field.appendChild(input);
+
+                const toggle = document.createElement('button');
+                toggle.type = 'button';
+                toggle.className = 'password-toggle';
+                toggle.textContent = 'Show';
+                toggle.setAttribute('aria-label', 'Show password');
+                toggle.setAttribute('aria-controls', input.id);
+                toggle.setAttribute('aria-pressed', 'false');
+                field.appendChild(toggle);
+
+                toggle.addEventListener('click', () => {
+                    const showPassword = input.type === 'password';
+                    input.type = showPassword ? 'text' : 'password';
+                    toggle.textContent = showPassword ? 'Hide' : 'Show';
+                    toggle.setAttribute('aria-label', showPassword ? 'Hide password' : 'Show password');
+                    toggle.setAttribute('aria-pressed', String(showPassword));
+                });
+            });
+
+            document.querySelectorAll('[data-add-to-cart]').forEach((button) => {
+                button.addEventListener('click', async (event) => {
+                    event.preventDefault();
+                    const productId = button.dataset.productId;
+                    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken');
+                    const response = await fetch(`/cart/add/${productId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrfToken,
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                        },
+                        credentials: 'same-origin'
+                    });
+
+                    const data = await response.json();
+                    const countElement = document.getElementById('cart-count');
+                    if (countElement && data.cart_count !== undefined) {
+                        countElement.textContent = data.cart_count;
+                    }
+                    showToast(data.message || 'Added to cart');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

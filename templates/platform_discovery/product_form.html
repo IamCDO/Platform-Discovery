@@ -1,0 +1,16 @@
+{% extends 'platform_discovery/base.html' %}
+
+{% block title %}{% if mode == 'edit' %}Edit product{% else %}Add product{% endif %}{% endblock %}
+
+{% block content %}
+<section class="section-block narrow-form">
+    <div class="card form-card">
+        <h2>{% if mode == 'edit' %}Edit product{% else %}Add new product{% endif %}</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="primary-btn">Save product</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

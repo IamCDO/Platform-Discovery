@@ -1,0 +1,55 @@
+{% extends 'platform_discovery/base.html' %}
+
+{% block title %}{{ business.name }}{% endblock %}
+
+{% block content %}
+<section class="business-header card business-header-card">
+    <div class="business-hero-media">
+        <img src="{{ business.default_image_url }}" alt="{{ business.name }}" class="store-hero-image" />
+    </div>
+    <div>
+        <span class="eyebrow">{{ business.category.name }}</span>
+        <h1>{{ business.name }}</h1>
+        <p>{{ business.description }}</p>
+        <div class="meta-row">
+            <span>Location: {{ business.display_location }}</span>
+            <span>Business ID: {{ business.business_id }}</span>
+        </div>
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="section-header">
+        <h2>Products</h2>
+    </div>
+
+    <form method="get" class="search-box inline-search">
+        <input type="text" name="q" value="{{ search_term }}" placeholder="Search products in this store" />
+        <button type="submit">Search</button>
+    </form>
+
+    <div class="grid three-col">
+        {% for product in products %}
+            <div class="card product-card">
+                <img src="{{ product.default_image_url }}" alt="{{ product.name }}" class="product-thumb" />
+                <div class="card-top-row">
+                    <h3>{{ product.name }}</h3>
+                    {% if product.has_discount %}<span class="promo-pill">-{{ product.discount_percent }}%</span>{% endif %}
+                </div>
+                <div class="meta-row small-meta-line">
+                    <span>Sold by {{ product.business.name }}</span>
+                </div>
+                <p>{{ product.description|truncatewords:18 }}</p>
+                <div class="price-row">
+                    <strong>₦{{ product.discounted_price }}</strong>
+                    {% if product.has_discount %}<span class="old-price">₦{{ product.price }}</span>{% endif %}
+                </div>
+                <div class="small-meta">Stock: {{ product.stock }}</div>
+                <button class="primary-btn small-btn" data-add-to-cart data-product-id="{{ product.id }}">Add to cart</button>
+            </div>
+        {% empty %}
+            <p>No products are available in this store right now.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
