@@ -1,1 +1,1 @@
-gunicorn.WSGI
+gunicorn.wsgi
